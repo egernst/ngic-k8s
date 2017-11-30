@@ -11,9 +11,18 @@ metadata:
 spec:
   containers:
   - name: ngic-cp
-    image: "ngiccorddemo/ngic-cp"
+    image: "ngiccorddemo/ngic-cp:vbox"
     stdin: true
     tty: true
+    volumeMounts:
+    - name: config-volume
+      mountPath: /opt/ngic/config
+  volumes:
+    - name: config-volume
+      configMap:
+        # Provide the name of the ConfigMap containing the files you want
+        # to add to the container
+        name: ngic-config
 
 ---
 apiVersion: v1
@@ -29,9 +38,23 @@ metadata:
 spec:
   containers:
   - name: ngic-dp
-    image: "ngiccorddemo/ngic-dp"
+    image: "ngiccorddemo/ngic-dp:vbox"
     stdin: true
     tty: true
+    volumeMounts:
+    - name: config-volume
+      mountPath: /opt/ngic/config
+    securityContext:
+      capabilities:
+        add:
+          - NET_RAW
+          - IPC_LOCK
+  volumes:
+    - name: config-volume
+      configMap:
+        # Provide the name of the ConfigMap containing the files you want
+        # to add to the container
+        name: ngic-config
 
 ---
 apiVersion: v1
