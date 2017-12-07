@@ -11,7 +11,7 @@ metadata:
 spec:
   containers:
   - name: ngic-cp
-    image: "ngiccorddemo/ngic-cp:vbox"
+    image: "ngiccorddemo/ngic-cp:k8s"
     stdin: true
     tty: true
     volumeMounts:
@@ -38,7 +38,7 @@ metadata:
 spec:
   containers:
   - name: ngic-dp
-    image: "ngiccorddemo/ngic-dp:vbox"
+    image: "ngiccorddemo/ngic-dp:k8s"
     stdin: true
     tty: true
     volumeMounts:
@@ -70,6 +70,6 @@ metadata:
 spec:
   containers:
   - name: ngic-traffic
-    image: "ngiccorddemo/ngic-traffic"
+    image: "ngiccorddemo/ngic-traffic:k8s"
     stdin: true
     tty: true
