@@ -12,6 +12,7 @@ spec:
   containers:
   - name: ngic-cp
     image: "ngiccorddemo/ngic-cp:k8s"
+    command: ["/opt/ngic/bin/launch.sh" ,"cp"]
     stdin: true
     tty: true
     volumeMounts:
@@ -40,6 +41,7 @@ spec:
   - name: ngic-dp
     image: "ngiccorddemo/ngic-dp:k8s"
     stdin: true
+    command: ["/opt/ngic/bin/launch.sh" ,"dp"]
     tty: true
     volumeMounts:
     - name: config-volume
