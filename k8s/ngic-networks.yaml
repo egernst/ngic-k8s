@@ -11,7 +11,7 @@ args: '[
         "bridge": "s11-net",
         "ipam": {
             "type": "host-local",
-            "subnet": "10.1.10.0/24"
+            "subnet": "1.1.1.0/24"
         }
     }
 ]'
@@ -29,7 +29,7 @@ args: '[
         "bridge": "s1u-net",
         "ipam": {
             "type": "host-local",
-            "subnet": "11.1.1.0/24"
+            "subnet": "2.2.2.0/24"
         }
     }
 ]'
@@ -47,7 +47,7 @@ args: '[
         "bridge": "sgi-net",
         "ipam": {
             "type": "host-local",
-            "subnet": "13.1.1.0/24"
+            "subnet": "3.3.3.0/24"
         }
     }
 ]'
@@ -65,7 +65,7 @@ args: '[
         "bridge": "cpdp-net",
         "ipam": {
             "type": "host-local",
-            "subnet": "172.26.0.0/24"
+            "subnet": "4.4.4.0/24"
         }
     }
 ]'
