@@ -1,3 +1,4 @@
+ERROR_DEPRECATED.
 ---
 apiVersion: v1
 kind: Pod # TODO make these deployments later
