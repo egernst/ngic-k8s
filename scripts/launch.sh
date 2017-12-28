@@ -102,14 +102,22 @@ then
 elif [ $1 == "traffic" ]
 then
     echo "Configuring Traffic Container"
+    if [ -d "/sriov-cni" ]; then
+        echo "================== SR-IOV FOUND ============"
+        RTR_SGI_IP=9.9.9.9
+        MME_S11_IP=10.10.10.10
+        ENB_S11_IP=11.11.11.11
+    else #dev --vdev af_packt
+        RTR_SGI_IP=$(netstat -ie | grep -A1 sgi-net | tail -1 | awk '{print $2}' | tr -d addr:)
+        MME_S11_IP=$(netstat -ie | grep -A1 s11-net | tail -1 | awk '{print $2}' | tr -d addr:)
+
+        # Requires its own ENB address (but does not need to share)
+        ENB_S11_IP=$(netstat -ie | grep -A1 s1u-net | tail -1 | awk '{print $2}' | tr -d addr:)
+    fi
+
     # set the variables we provide
-    RTR_SGI_IP=$(netstat -ie | grep -A1 sgi-net | tail -1 | awk '{print $2}' | tr -d addr:)
-    MME_S11_IP=$(netstat -ie | grep -A1 s11-net | tail -1 | awk '{print $2}' | tr -d addr:)
     consul kv put --http-addr=consul:8500 RTR_SGI_IP $RTR_SGI_IP
     consul kv put --http-addr=consul:8500 MME_S11_IP $MME_S11_IP
-
-    # Requires its own ENB address (but does not need to share)
-    ENB_S11_IP=$(netstat -ie | grep -A1 s1u-net | tail -1 | awk '{print $2}' | tr -d addr:)
 
     declare -a requires=( "SGW_S1U_IP" "SGW_SGI_IP" "SGW_S11_IP" )
 
@@ -118,6 +126,7 @@ then
 
     # perform the traffic rewrites
     ./rewrite_pcaps.py $ENB_S11_IP $SGW_S11_IP $SGW_S1U_IP $SGW_SGI_IP
+    sleep 3600
 
 else
     echo "Unsupported $1"
