@@ -1,0 +1,169 @@
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: ngic-cp-deployment
+  labels:
+    app: ngic-cp
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: ngic-cp
+  template:
+    metadata:
+      labels:
+        app: ngic-cp
+    spec:
+      containers:
+      - name: ngic-cp
+        image: "ngiccorddemo/ngic-cp:k8s-bm"
+        stdin: true
+        command: [ "/opt/ngic/scripts/launch.sh", "cp"]
+        tty: true
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/ngic/config
+        - name: scripts-volume
+          mountPath: /opt/ngic/scripts
+        - name: hugepage
+          mountPath: /dev/hugepages
+        resources:
+          limits:
+            hugepages-1Gi: 1Gi
+            cpu: 3
+            memory: 200Mi
+      volumes:
+        - name: config-volume
+          configMap:
+            name: ngic-config
+        - name: scripts-volume
+          secret:
+            secretName: ngic-scripts
+            defaultMode: 511
+        - name: hugepage
+          emptyDir:
+            medium: HugePages
+
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: ngic-dp-deployment
+  labels:
+    app: ngic-dp
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: ngic-dp
+  template:
+    metadata:
+      labels:
+        app: ngic-dp
+      annotations:
+        networks: '[
+            { "name": "s1u-net" },
+            { "name": "sgi-net" }
+        ]'
+    spec:
+      containers:
+      - name: ngic-dp
+        image: "ngiccorddemo/ngic-dp:k8s-bm"
+        stdin: true
+        tty: true
+        command: [ "/opt/ngic/scripts/launch.sh", "dp"]
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/ngic/config
+        - name: hugepage
+          mountPath: /dev/hugepages
+        - name: scripts-volume
+          mountPath: /opt/ngic/scripts
+        - name: sriov-volume
+          mountPath: /sriov-cni
+        - name: vfio-volume
+          mountPath: /dev/vfio
+        resources:
+          limits:
+            hugepages-1Gi: 3Gi
+            cpu: 8
+            memory: 200Mi
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - NET_ADMIN
+              - IPC_LOCK
+      volumes:
+        - name: config-volume
+          configMap:
+            name: ngic-config
+        - name: scripts-volume
+          secret:
+            secretName: ngic-scripts
+            defaultMode: 511
+        - name: hugepage
+          emptyDir:
+            medium: HugePages
+        - name: sriov-volume
+          hostPath:
+            path: /sriov-cni
+            type: Directory
+        - name: vfio-volume
+          hostPath:
+            path: /dev/vfio
+            type: Directory
+
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: ngic-traffic-deployment
+  labels:
+    app: ngic-traffic
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: ngic-traffic
+  template:
+    metadata:
+      labels:
+        app: ngic-traffic
+      annotations:
+        networks: '[
+            { "name": "s1u-net" },
+            { "name": "sgi-net" }
+        ]'
+    spec:
+      containers:
+      - name: ngic-traffic
+        image: "ngiccorddemo/ngic-traffic:k8s-bm"
+        stdin: true
+        tty: true
+        command: [ "/opt/ngic/scripts/launch.sh", "traffic"]
+        volumeMounts:
+        - name: scripts-volume
+          mountPath: /opt/ngic/scripts
+        - name: sriov-volume
+          mountPath: /sriov-cni
+        - name: vfio-volume
+          mountPath: /dev/vfio
+        securityContext:
+          capabilities:
+            add:
+              - NET_ADMIN
+      volumes:
+        - name: scripts-volume
+          secret:
+            secretName: ngic-scripts
+            defaultMode: 511
+        - name: sriov-volume
+          hostPath:
+            path: /sriov-cni
+            type: Directory
+        - name: vfio-volume
+          hostPath:
+            path: /dev/vfio
+            type: Directory

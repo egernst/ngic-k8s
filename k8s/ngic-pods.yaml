@@ -1,76 +1,142 @@
-ERROR_DEPRECATED.
 ---
 apiVersion: v1
 kind: Pod # TODO make these deployments later
 metadata:
   name: ngic-cp
-  annotations:
-    networks: '[
-        { "name": "s11-net" },
-        { "name": "cpdp-net" }
-    ]'
+  labels:
+    name: ngic-cp
 spec:
   containers:
   - name: ngic-cp
-    image: "ngiccorddemo/ngic-cp:k8s"
+    image: "ngiccorddemo/ngic-cp:k8s-bm"
     stdin: true
+    command: [ "/opt/ngic/scripts/launch.sh", "cp"]
     tty: true
     volumeMounts:
     - name: config-volume
       mountPath: /opt/ngic/config
+    - name: scripts-volume
+      mountPath: /opt/ngic/scripts
+    - name: hugepage
+      mountPath: /dev/hugepages
+    resources:
+      limits:
+        hugepages-1Gi: 1Gi
+        cpu: 3
+        memory: 200Mi
   volumes:
     - name: config-volume
       configMap:
-        # Provide the name of the ConfigMap containing the files you want
-        # to add to the container
         name: ngic-config
+    - name: scripts-volume
+      secret:
+        secretName: ngic-scripts
+        defaultMode: 511
+    - name: hugepage
+      emptyDir:
+        medium: HugePages
 
 ---
 apiVersion: v1
 kind: Pod # TODO make these deployments later
 metadata:
   name: ngic-dp
+  labels:
+    name: ngic-dp
   annotations:
     networks: '[
         { "name": "s1u-net" },
-        { "name": "sgi-net" },
-        { "name": "cpdp-net" }
+        { "name": "sgi-net" }
     ]'
 spec:
   containers:
   - name: ngic-dp
-    image: "ngiccorddemo/ngic-dp:k8s"
+    image: "ngiccorddemo/ngic-dp:k8s-bm"
     stdin: true
     tty: true
+    command: [ "/opt/ngic/scripts/launch.sh", "dp"]
     volumeMounts:
     - name: config-volume
       mountPath: /opt/ngic/config
+    - name: hugepage
+      mountPath: /dev/hugepages
+    - name: scripts-volume
+      mountPath: /opt/ngic/scripts
+    - name: sriov-volume
+      mountPath: /sriov-cni
+    - name: vfio-volume
+      mountPath: /dev/vfio
+    resources:
+      limits:
+        hugepages-1Gi: 3Gi
+        cpu: 8
+        memory: 200Mi
     securityContext:
+      privileged: true
       capabilities:
         add:
-          - NET_RAW
+          - NET_ADMIN
           - IPC_LOCK
   volumes:
     - name: config-volume
       configMap:
-        # Provide the name of the ConfigMap containing the files you want
-        # to add to the container
         name: ngic-config
+    - name: scripts-volume
+      secret:
+        secretName: ngic-scripts
+        defaultMode: 511
+    - name: hugepage
+      emptyDir:
+        medium: HugePages
+    - name: sriov-volume
+      hostPath:
+        path: /sriov-cni
+        type: Directory
+    - name: vfio-volume
+      hostPath:
+        path: /dev/vfio
+        type: Directory
 
 ---
 apiVersion: v1
 kind: Pod # TODO make these deployments later
 metadata:
   name: ngic-traffic
+  labels:
+    name: ngic-traffic
   annotations:
     networks: '[
         { "name": "s1u-net" },
-        { "name": "sgi-net" },
-        { "name": "s11-net" }
+        { "name": "sgi-net" }
     ]'
 spec:
   containers:
   - name: ngic-traffic
-    image: "ngiccorddemo/ngic-traffic:k8s"
+    image: "ngiccorddemo/ngic-traffic:k8s-bm"
     stdin: true
     tty: true
+    command: [ "/opt/ngic/scripts/launch.sh", "traffic"]
+    volumeMounts:
+    - name: scripts-volume
+      mountPath: /opt/ngic/scripts
+    - name: sriov-volume
+      mountPath: /sriov-cni
+    - name: vfio-volume
+      mountPath: /dev/vfio
+    securityContext:
+      capabilities:
+        add:
+          - NET_ADMIN
+  volumes:
+    - name: scripts-volume
+      secret:
+        secretName: ngic-scripts
+        defaultMode: 511
+    - name: sriov-volume
+      hostPath:
+        path: /sriov-cni
+        type: Directory
+    - name: vfio-volume
+      hostPath:
+        path: /dev/vfio
+        type: Directory

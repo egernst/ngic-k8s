@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cp
+spec:
+  selector:
+    app: ngic-cp
+  clusterIP: None
+  ports:
+  - name: s11
+    port: 2123
+    protocol: UDP
+  - name: cpdp
+    port: 21
+    protocol: UDP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dp
+spec:
+  selector:
+    app: ngic-dp
+  clusterIP: None
+  ports:
+  - name: cpdp
+    port: 20
+    protocol: UDP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traffic
+spec:
+  selector:
+    app: ngic-traffic
+  clusterIP: None
+  ports:
+  - name: s11
+    port: 2123
+    protocol: UDP

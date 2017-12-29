@@ -95,7 +95,7 @@ then
         ENB_S1U_IP=$(netstat -ie | grep -A1 s1u-net | tail -1 | awk '{print $2}' | tr -d addr:)
     fi
  
-    SGW_S11_IP=cp
+    SGW_S11_IP=cp.default.svc.cluster.local
 
     # set the variables we provide
     consul kv put --http-addr=consul:8500 RTR_SGI_IP $RTR_SGI_IP

@@ -1,0 +1,12 @@
+apiVersion: kubeadm.k8s.io/v1alpha1
+kind: MasterConfiguration
+api:
+  bindPort: 443
+networking:
+  podSubnet: 10.244.0.0/16
+apiServerExtraArgs:
+  feature-gates: "HugePages=true,CPUManager=true"
+controllerManagerExtraArgs:
+  feature-gates: "HugePages=true,CPUManager=true"
+schedulerExtraArgs:
+  feature-gates: "HugePages=true,CPUManager=true"
