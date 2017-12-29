@@ -29,23 +29,14 @@ if [ $1 == "cp" ]
 then
     cd /opt/ngic/bin
     echo "Configuring CP"
-    # set the variables we provide
-    SGW_S11_IP=$(netstat -ie | grep -A1 eth0 | tail -1 | awk '{print $2}' | tr -d addr:)
-    CP_CPDP_IP=$(netstat -ie | grep -A1 eth0 | tail -1 | awk '{print $2}' | tr -d addr:)
-    consul kv put --http-addr=consul:8500 SGW_S11_IP $SGW_S11_IP
-    consul kv put --http-addr=consul:8500 CP_CPDP_IP $CP_CPDP_IP
 
-    declare -a requires=( "SGW_S1U_IP" "MME_S11_IP" "DP_CPDP_IP" )
+    declare -a requires=( "SGW_S1U_IP" )
 
     # get the variables we require
     get_from_consul
 
     # get the rest of the variables
     . /opt/ngic/config/cp_config.cfg
-
-    # update interface.cfg cp_comm_ip =
-    sed -ri "s,(dp_comm_ip = ).*,\1$DP_CPDP_IP," ../config/interface.cfg
-    sed -ri "s,(cp_comm_ip = ).*,\1$CP_CPDP_IP," ../config/interface.cfg
 
     # now run the binary
     ./ngic_controlplane  $EAL_ARGS -- $APP_ARGS
@@ -74,20 +65,13 @@ then
         DEVICES="--no-pci --vdev eth_af_packet0,iface=s1u-net --vdev eth_af_packet1,iface=sgi-net"
     fi
 
-    DP_CPDP_IP=$(netstat -ie | grep -A1 eth0 | tail -1 | awk '{print $2}' | tr -d addr:)
-
     consul kv put --http-addr=consul:8500 SGW_S1U_IP $SGW_S1U_IP
     consul kv put --http-addr=consul:8500 SGW_SGI_IP $SGW_SGI_IP
-    consul kv put --http-addr=consul:8500 DP_CPDP_IP $DP_CPDP_IP
 
-    declare -a requires=( "RTR_SGI_IP" "CP_CPDP_IP" )
+    declare -a requires=( "RTR_SGI_IP" )
 
     # get the variables we require
     get_from_consul
-
-    # update interface.cfg cp_comm_ip =
-    sed -ri "s,(dp_comm_ip = ).*,\1$DP_CPDP_IP," ../config/interface.cfg
-    sed -ri "s,(cp_comm_ip = ).*,\1$CP_CPDP_IP," ../config/interface.cfg
 
     # get the rest of the variables
     . /opt/ngic/config/dp_config.cfg
@@ -111,13 +95,12 @@ then
         ENB_S1U_IP=$(netstat -ie | grep -A1 s1u-net | tail -1 | awk '{print $2}' | tr -d addr:)
     fi
  
-    MME_S11_IP=$(netstat -ie | grep -A1 eth0 | tail -1 | awk '{print $2}' | tr -d addr:)
+    SGW_S11_IP=cp
 
     # set the variables we provide
     consul kv put --http-addr=consul:8500 RTR_SGI_IP $RTR_SGI_IP
-    consul kv put --http-addr=consul:8500 MME_S11_IP $MME_S11_IP
 
-    declare -a requires=( "SGW_S1U_IP" "SGW_SGI_IP" "SGW_S11_IP" )
+    declare -a requires=( "SGW_S1U_IP" "SGW_SGI_IP"  )
 
     # get the variables we require
     get_from_consul
