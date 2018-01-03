@@ -7,6 +7,8 @@
 #stack@s2rf6n6:~$ cat /etc/fstab
 ## ....
 #nodev /dev/hugepages hugetlbfs pagesize=1GB 0 0
+#
+# (To change the above, edit  /etc/default/grub then run `update-grub`
 
 sudo modprobe vfio-pci
 sudo mkdir -p /sriov-cni
