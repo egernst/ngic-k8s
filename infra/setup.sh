@@ -1,7 +1,3 @@
-# optional: install dashboard:
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
-##kubectl create rolebinding web-admin-binding --clusterrole=admin --user=system:bootstrap:(*part of token before the dot at kubecreate*) --namespace=default
-
 # setup consul
 cd ../consul-on-kubernetes
 ## go to consul directory and run the ./populate script
@@ -12,16 +8,24 @@ kubectl logs -f consul-0
 cd ../ngic-k8s
 kubectl create configmap ngic-config --from-file=config
 
-cd ../k8s-testing-scripts
+# create secret for mounting the launch script (as executable)
+kubectl create secret generic ngic-scripts --from-file=scripts
 
-#create custom resource defined network:
-kubectl create -f ngic/crd-network.yaml
+# create custom resource defined network:
+kubectl create -f k8s/crd-network.yaml
 
-#create a few sample networks
-kubectl create -f ngic/ngic-networks.yaml
+# create a few sample networks
+kubectl create -f k8s/ngic-networks.yaml
 
-#launch multihomed pod
-kubectl create -f ngic/ngic-pods.yaml
+# setup SR-IOV. these 2 interfaces are the same as used in k8s/ngic-networks.yaml
+./infra/sriov.sh ens785f0 0
+./infra/sriov.sh ens785f1 1
+
+# create the service
+kubectl create -f k8s/ngic-services.yaml
+
+# launch multihomed pod
+kubectl apply -f k8s/ngic-deployment.yaml --record
 
 kubectl get pods
 
@@ -29,7 +33,7 @@ kubectl get pods
 ### Notes:
 
 # For future runs, rather than delete and repopulate consul, do:
-## kubectl exec -it ngic-traffic -- ./delete.sh
+## kubectl exec -it ngic-traffic-deployment-(sometag) -- ./delete.sh
 
 # Example on kubeadm dashboard RBAC:
 ## kubectl create rolebinding web-admin-binding --clusterrole=admin -- user=system:bootstrap:a358ed --namespace=default
