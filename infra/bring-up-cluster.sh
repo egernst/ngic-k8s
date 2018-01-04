@@ -1,14 +1,15 @@
 # Note that intel_iommu and hugepages settings:
 #$ cat /proc/cmdline
 #BOOT_IMAGE=/vmlinuz-4.10.0-42-generic root=/dev/mapper/s2rf6n6--vg-root ro intel_iommu=on hugepagesz=1G hugepages=16
-#
-# Also note the huge pages in fstab.  (Do a mkdir -p /dev/hugepages )
+# Note: (To change the above, edit  /etc/default/grub then run `update-grub`
+# 
+# ----
+# Also change the huge pages in fstab.  (Do a mkdir -p /dev/hugepages )
 #
 #stack@s2rf6n6:~$ cat /etc/fstab
 ## ....
 #nodev /dev/hugepages hugetlbfs pagesize=1GB 0 0
 #
-# (To change the above, edit  /etc/default/grub then run `update-grub`
 
 sudo modprobe vfio-pci
 sudo mkdir -p /sriov-cni
