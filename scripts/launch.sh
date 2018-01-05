@@ -82,6 +82,7 @@ then
 
 elif [ $1 == "traffic" ]
 then
+    cd /opt/ngic/pcap
     echo "Configuring Traffic Container"
     if [ -d "/sriov-cni" ]; then
         echo "================== SR-IOV FOUND ============"
