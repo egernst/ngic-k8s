@@ -1,0 +1,120 @@
+---
+apiVersion: "kubernetes.com/v1"
+kind: Network
+metadata:
+  name: s11-net
+plugin: bridge
+args: '[
+    {
+        "name": "s11-net",
+        "type": "bridge",
+        "bridge": "s11-net",
+        "ipam": {
+            "type": "host-local",
+            "subnet": "1.1.1.0/24"
+        }
+    }
+]'
+---
+apiVersion: "kubernetes.com/v1"
+kind: Network
+metadata:
+  name: s1u-net-dpdk
+plugin: sriov
+args: '[
+    {
+        "name": "s1u-net",
+        "type": "sriov",
+        "if0": "ens785f0",
+        "cniDir": "/sriov-cni",
+        "ipam": {
+            "type": "host-local",
+            "subnet": "2.2.2.0/24"
+        },
+	"dpdk": {
+		"kernel_driver": "i40evf",
+		"dpdk_driver": "vfio-pci",
+		"dpdk_tool": "/opt/dpdk/usertools/dpdk-devbind.py"
+
+	}
+    }
+]'
+
+---
+apiVersion: "kubernetes.com/v1"
+kind: Network
+metadata:
+  name: s1u-net
+plugin: sriov
+args: '[
+    {
+        "name": "s1u-net",
+        "type": "sriov",
+        "if0": "ens785f0",
+        "ipam": {
+            "type": "host-local",
+            "subnet": "2.2.2.0/24"
+        }
+    }
+]'
+
+---
+apiVersion: "kubernetes.com/v1"
+kind: Network
+metadata:
+  name: sgi-net
+plugin: sriov
+args: '[
+    {
+        "name": "sgi-net",
+        "type": "sriov",
+        "if0": "ens785f1",
+        "ipam": {
+            "type": "host-local",
+            "subnet": "3.3.3.0/24"
+        }
+    }
+]'
+---
+apiVersion: "kubernetes.com/v1"
+kind: Network
+metadata:
+  name: sgi-net-dpdk
+plugin: sriov
+args: '[
+    {
+        "name": "sgi-net",
+        "type": "sriov",
+        "if0": "ens785f1",
+        "cniDir": "/sriov-cni",
+        "ipam": {
+            "type": "host-local",
+            "subnet": "3.3.3.0/24"
+        },
+	"dpdk": {
+		"kernel_driver": "i40evf",
+		"dpdk_driver": "vfio-pci",
+		"dpdk_tool": "/opt/dpdk/usertools/dpdk-devbind.py"
+
+	}
+    }
+]'
+
+---
+apiVersion: "kubernetes.com/v1"
+kind: Network
+metadata:
+  name: cpdp-net
+plugin: bridge
+args: '[
+    {
+        "name": "cpdp-net",
+        "type": "bridge",
+        "bridge": "cpdp-net",
+        "ipam": {
+            "type": "host-local",
+            "subnet": "4.4.4.0/24"
+        }
+    }
+]'
+
