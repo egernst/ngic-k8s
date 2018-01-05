@@ -80,6 +80,10 @@ spec:
           mountPath: /dev/hugepages
         - name: scripts-volume
           mountPath: /opt/ngic/scripts
+        - name: sriov-volume
+          mountPath: /sriov-cni
+        - name: vfio-volume
+          mountPath: /dev/vfio
         resources:
           limits:
             hugepages-1Gi: 3Gi
@@ -102,6 +106,14 @@ spec:
         - name: hugepage
           emptyDir:
             medium: HugePages
+        - name: sriov-volume
+          hostPath:
+            path: /sriov-cni
+            type: Directory
+        - name: vfio-volume
+          hostPath:
+            path: /dev/vfio
+            type: Directory
 
 ---
 apiVersion: apps/v1beta2
@@ -134,6 +146,10 @@ spec:
         volumeMounts:
         - name: scripts-volume
           mountPath: /opt/ngic/scripts
+        - name: sriov-volume
+          mountPath: /sriov-cni
+        - name: vfio-volume
+          mountPath: /dev/vfio
         securityContext:
           capabilities:
             add:
@@ -143,3 +159,11 @@ spec:
           secret:
             secretName: ngic-scripts
             defaultMode: 511
+        - name: sriov-volume
+          hostPath:
+            path: /sriov-cni
+            type: Directory
+        - name: vfio-volume
+          hostPath:
+            path: /dev/vfio
+            type: Directory

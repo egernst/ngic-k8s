@@ -21,12 +21,12 @@ apiVersion: "kubernetes.com/v1"
 kind: Network
 metadata:
   name: s1u-net
-plugin: sriov
+plugin: bridge
 args: '[
     {
         "name": "s1u-net",
-        "type": "sriov",
-        "if0": "ens785f0",
+        "type": "bridge",
+        "bridge": "s1u-net",
         "ipam": {
             "type": "host-local",
             "subnet": "2.2.2.0/24"
@@ -39,12 +39,12 @@ apiVersion: "kubernetes.com/v1"
 kind: Network
 metadata:
   name: sgi-net
-plugin: sriov
+plugin: bridge
 args: '[
     {
         "name": "sgi-net",
-        "type": "sriov",
-        "if0": "ens785f1",
+        "type": "bridge",
+        "bridge": "sgi-net",
         "ipam": {
             "type": "host-local",
             "subnet": "3.3.3.0/24"

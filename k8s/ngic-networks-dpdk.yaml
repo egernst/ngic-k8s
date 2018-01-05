@@ -27,10 +27,17 @@ args: '[
         "name": "s1u-net",
         "type": "sriov",
         "if0": "ens785f0",
+        "cniDir": "/sriov-cni",
         "ipam": {
             "type": "host-local",
             "subnet": "2.2.2.0/24"
-        }
+        },
+	"dpdk": {
+		"kernel_driver": "i40evf",
+		"dpdk_driver": "vfio-pci",
+		"dpdk_tool": "/opt/dpdk/usertools/dpdk-devbind.py"
+
+	}
     }
 ]'
 
@@ -45,10 +52,17 @@ args: '[
         "name": "sgi-net",
         "type": "sriov",
         "if0": "ens785f1",
+        "cniDir": "/sriov-cni",
         "ipam": {
             "type": "host-local",
             "subnet": "3.3.3.0/24"
-        }
+        },
+	"dpdk": {
+		"kernel_driver": "i40evf",
+		"dpdk_driver": "vfio-pci",
+		"dpdk_tool": "/opt/dpdk/usertools/dpdk-devbind.py"
+
+	}
     }
 ]'
 
